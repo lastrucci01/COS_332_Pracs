@@ -6,5 +6,9 @@ debug:
 	cp target/debug/$(APP_NAME) $(CGI_DIR)/$(APP_NAME)
 	python3 -m http.server --cgi
 
+release:
+	cargo build
+	sudo cp target/debug/${APP_NAME} /var/www/${CGI_DIR}/${APP_NAME}
+
 clean:
 	cargo clean
