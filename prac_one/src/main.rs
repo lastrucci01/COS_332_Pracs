@@ -145,7 +145,7 @@ fn wrong() -> String{
       </main>
       <footer>
         <p class="footer"> Richard Lastrucci - 20430168 / Thabo Chesane - u20507102 </p>
-        <p class="footer"> COS 332</p>
+        <p class="footer"> COS 332 </p>
       </footer>
     </body>
   </html>
