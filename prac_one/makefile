@@ -9,6 +9,7 @@ debug:
 release:
 	cargo build
 	sudo cp target/debug/${APP_NAME} /var/www/${CGI_DIR}/${APP_NAME}
+	sudo cp src/style.css /var/www/${CGI_DIR}/style.css
 
 clean:
 	cargo clean
