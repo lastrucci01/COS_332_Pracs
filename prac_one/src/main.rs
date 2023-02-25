@@ -70,7 +70,7 @@ fn default() -> String{
             "#, divs);
 
   format!(
-      "HTTP/1.1 200 OK\r\nContent-Length: {}\r\n\r\n{}",
+      "Content-Type: text/html\r\nContent-Length: {}\r\n\r\n{}",
       html.len(),
       html
   )
@@ -109,7 +109,7 @@ fn right() -> String {
             "#;
 
     format!(
-        "HTTP/1.1 200 OK\r\nContent-Length: {}\r\n\r\n{}",
+        "Content-type: text/html\r\nContent-Length: {}\r\n\r\n{}",
         html.len(),
         html
     )
@@ -149,7 +149,7 @@ fn wrong() -> String{
             "#;
 
     format!(
-        "HTTP/1.1 200 OK\r\nContent-Length: {}\r\n\r\n{}",
+        "Content-Type: text/html\r\nContent-Length: {}\r\n\r\n{}",
         html.len(),
         html
     )
