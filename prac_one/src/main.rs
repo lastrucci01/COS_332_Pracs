@@ -1,6 +1,9 @@
 use std::env;
 use rand::Rng;
 
+// Richard Lastrucci - u20430168
+// Thabo Chesane - u20507102
+
 fn main() {
     let args: Vec<_> = env::args().collect();
 
@@ -62,7 +65,7 @@ fn default() -> String{
         {}
         </main>
         <footer>
-          <p class="footer left"> Richard Lastrucci - 20430168</p>
+          <p class="footer left"> Richard Lastrucci - 20430168 / Thabo Chesane - u20507102 </p>
           <p class="footer right"> COS 332</p>
         </footer>
       </body>
@@ -101,7 +104,7 @@ fn right() -> String {
       <div>
       </main>
       <footer>
-        <p class="footer left"> Richard Lastrucci - 20430168</p>
+        <p class="footer left"> Richard Lastrucci - 20430168 / Thabo Chesane - u20507102</p>
         <p class="footer right"> COS 332</p>
       </footer>
     </body>
@@ -141,7 +144,7 @@ fn wrong() -> String{
       <div>
       </main>
       <footer>
-        <p class="footer left"> Richard Lastrucci - 20430168</p>
+        <p class="footer left"> Richard Lastrucci - 20430168 / Thabo Chesane - u20507102 </p>
         <p class="footer right"> COS 332</p>
       </footer>
     </body>
