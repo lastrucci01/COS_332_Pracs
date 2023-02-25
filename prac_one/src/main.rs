@@ -65,8 +65,8 @@ fn default() -> String{
         {}
         </main>
         <footer>
-          <p class="footer left"> Richard Lastrucci - 20430168 / Thabo Chesane - u20507102 </p>
-          <p class="footer right"> COS 332</p>
+          <p class="footer"> Richard Lastrucci - 20430168 / Thabo Chesane - u20507102 </p>
+          <p class="footer"> COS 332</p>
         </footer>
       </body>
     </html>
@@ -104,8 +104,8 @@ fn right() -> String {
       <div>
       </main>
       <footer>
-        <p class="footer left"> Richard Lastrucci - 20430168 / Thabo Chesane - u20507102</p>
-        <p class="footer right"> COS 332</p>
+        <p class="footer"> Richard Lastrucci - 20430168 / Thabo Chesane - u20507102</p>
+        <p class="footer"> COS 332</p>
       </footer>
     </body>
   </html>
@@ -144,8 +144,8 @@ fn wrong() -> String{
       <div>
       </main>
       <footer>
-        <p class="footer left"> Richard Lastrucci - 20430168 / Thabo Chesane - u20507102 </p>
-        <p class="footer right"> COS 332</p>
+        <p class="footer"> Richard Lastrucci - 20430168 / Thabo Chesane - u20507102 </p>
+        <p class="footer"> COS 332</p>
       </footer>
     </body>
   </html>
