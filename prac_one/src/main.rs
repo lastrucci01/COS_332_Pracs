@@ -54,6 +54,7 @@ fn default() -> String{
     <html>
       <head>
         <meta charset="UTF-8">./style.css">
+        <link rel="stylesheet" href="/script.css">
         <title>COS 332 Prac One</title>
       </head>
       <body>
@@ -85,7 +86,7 @@ fn right() -> String {
   <html>
     <head>
       <meta charset="UTF-8">
-      <link rel="stylesheet" href="/home/ubuntu/COS_332_pracs/prac_one/src/style.css">
+      <link rel="stylesheet" href="/script.css">
       <title>COS 332 Prac One</title>
     </head>
     <body>
@@ -123,7 +124,7 @@ fn wrong() -> String{
   <html>
     <head>
       <meta charset="UTF-8">
-      <link rel="stylesheet" href="/home/ubuntu/COS_332_pracs/prac_one/src/style.css">
+      <link rel="stylesheet" href="/script.css">
       <title>COS 332 Prac One</title>
     </head>
     <body>
