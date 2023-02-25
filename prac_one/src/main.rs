@@ -53,7 +53,7 @@ fn default() -> String{
     <!DOCTYPE html>
     <html>
       <head>
-        <meta charset="UTF-8">./style.css">
+        <meta charset="UTF-8">
         <link rel="stylesheet" href="/style.css">
         <title>COS 332 Prac One</title>
       </head>
