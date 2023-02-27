@@ -13,7 +13,7 @@
 #include <string>
 #include <fstream>
 #include <iostream>
-#define PORT 55555
+#define PORT 8000
 #define numClients 50
 using namespace std;
 //Global variables.
@@ -33,16 +33,16 @@ string convertToString(char* a, int size)
     return s;
 }
  
-string TEXT_RESET = "\u001B[0m";
-string TEXT_BLACK = "\u001B[30m";
-string TEXT_RED = "\u001B[31m";
-string TEXT_GREEN = "\u001B[32m";
-string TEXT_YELLOW = "\u001B[33m";
-string TEXT_BLUE = "\u001B[34m";
-string TEXT_PURPLE = "\u001B[35m";
-string TEXT_CYAN = "\u001B[36m";
-string TEXT_WHITE = "\u001B[37m";
-string CLEAR_SCREEN = "\u001B[2J";
+string TEXT_RESET = "\\u001B[0m";
+string TEXT_BLACK = "\\u001B[30m";
+string TEXT_RED = "\\u001B[31m";
+string TEXT_GREEN = "\\u001B[32m";
+string TEXT_YELLOW = "\\u001B[33m";
+string TEXT_BLUE = "\\u001B[34m";
+string TEXT_PURPLE = "\\u001B[35m";
+string TEXT_CYAN = "\\u001B[36m";
+string TEXT_WHITE = "\\u001B[37m";
+string CLEAR_SCREEN = "\\u001B[2J";
 
 //messages 
 void sendMessage(int clientSocket, string message){
@@ -51,7 +51,7 @@ void sendMessage(int clientSocket, string message){
     send(clientSocket, a, message.length() + 1, 0);
 }
 void welcome(int clientSocket){
-    string mystring = "\u001B[2JWelcome to Richard's and Thabo's server.\r\nCommands Available:\r\nveiw - this shows the contents of the database.\r\nadd name,phone - this adds 'name' and their phone number to the database.\r\nremove name - this removes 'name' from the database.\r\nsearch name - this searches for 'name' and returns the data of 'name'.\r\nhelp - this shows this menu.\r\nquit - quits the server.\r\ninfo - for documentation\r\n";
+    string mystring = "\\u001B[2JWelcome to Richard's and Thabo's server.\r\nCommands Available:\r\nveiw - this shows the contents of the database.\r\nadd name,phone - this adds 'name' and their phone number to the database.\r\nremove name - this removes 'name' from the database.\r\nsearch name - this searches for 'name' and returns the data of 'name'.\r\nhelp - this shows this menu.\r\nquit - quits the server.\r\ninfo - for documentation\r\n";
     const void * a = mystring.c_str();
     send(clientSocket, a, mystring.length() + 1, 0);
 }
@@ -123,7 +123,7 @@ void interprate(string mystring, int clientSocket, int index){
         if(file.peek() == EOF){ //empty file
             string output = TEXT_YELLOW;
             output += CLEAR_SCREEN;
-            output += "The database is empty \r\n\u001B[1B";
+            output += "The database is empty \r\n\\u001B[1B";
             output += TEXT_RESET;
             sendMessage(clientSocket,output);
         }
@@ -132,7 +132,7 @@ void interprate(string mystring, int clientSocket, int index){
             string output = TEXT_GREEN;
             output += CLEAR_SCREEN;
             //also clear the screeen
-            output += "The database contents are: \r\n\u001B[1B";
+            output += "The database contents are: \r\n\\u001B[1B";
             output += TEXT_RESET;
             sendMessage(clientSocket,output);
             string user;
@@ -140,7 +140,7 @@ void interprate(string mystring, int clientSocket, int index){
                 user += "\r\n";
                 sendMessage(clientSocket,user);
             }
-            sendMessage(clientSocket,"\u001B[1B");
+            sendMessage(clientSocket,"\\u001B[1B");
         }
         file.close();
     }
@@ -152,7 +152,7 @@ void interprate(string mystring, int clientSocket, int index){
          string output ="";
         if(mystring.length() == 0){
             output = TEXT_RED;
-            output += "You did not specify the users Name, Surname and Phone number of the user you wish to add.\r\n\u001B[1B";
+            output += "You did not specify the users Name, Surname and Phone number of the user you wish to add.\r\n\\u001B[1B";
             output += TEXT_RESET;
             sendMessage(clientSocket,output);
         }
@@ -164,7 +164,7 @@ void interprate(string mystring, int clientSocket, int index){
                 if(line == mystring){
                     found = true;
                      output = TEXT_RED;
-                    output += mystring + " error the user already exists in the database.\r\n\u001B[1B";
+                    output += mystring + " error the user already exists in the database.\r\n\\u001B[1B";
                     output += TEXT_RESET;
                     sendMessage(clientSocket,output);
         
@@ -179,7 +179,7 @@ void interprate(string mystring, int clientSocket, int index){
 
             myfile.close();
             output = TEXT_GREEN;
-            output += mystring + " has been succeffully added to the database\r\n\u001B[1B";
+            output += mystring + " has been succeffully added to the database\r\n\\u001B[1B";
             output += TEXT_RESET;
             sendMessage(clientSocket,output);
               
@@ -196,7 +196,7 @@ void interprate(string mystring, int clientSocket, int index){
          string output ="";
         if(mystring.length() == 0){
             output = TEXT_RED;
-            output += "You did not specify the Name, Surname and Phone number of the user you wish to delete.\r\n\u001B[1B";
+            output += "You did not specify the Name, Surname and Phone number of the user you wish to delete.\r\n\\u001B[1B";
             output += TEXT_RESET;
             sendMessage(clientSocket,output);
         }
@@ -219,13 +219,13 @@ void interprate(string mystring, int clientSocket, int index){
                 file.open("database.txt",std::ofstream::out | std::ofstream::trunc);
                 file << temp;     
                 output = TEXT_GREEN;
-                output += mystring + " has been succeffully deleted from the database.\r\n\u001B[1B";
+                output += mystring + " has been succeffully deleted from the database.\r\n\\u001B[1B";
                 output += TEXT_RESET;
                 sendMessage(clientSocket,output);
             }
             else{
                 output = TEXT_RED;
-                output += mystring + " was not found in the database.\r\n\u001B[1B";
+                output += mystring + " was not found in the database.\r\n\\u001B[1B";
                 output += TEXT_RESET;
                 sendMessage(clientSocket,output);
             }
@@ -242,7 +242,7 @@ void interprate(string mystring, int clientSocket, int index){
         if(mystring.length() == 0){
             output = CLEAR_SCREEN;
             output += TEXT_RED;
-            output += "Please specify and search input.\r\n\u001B[1B";
+            output += "Please specify and search input.\r\n\\u001B[1B";
             output += TEXT_RESET;
             sendMessage(clientSocket,output);
         }
@@ -255,7 +255,7 @@ void interprate(string mystring, int clientSocket, int index){
                 if(!found){
                     output = CLEAR_SCREEN;
                     output += TEXT_GREEN;
-                    output += "here are usernames in the database that contain: "+mystring+"\r\n\u001B[1B";
+                    output += "here are usernames in the database that contain: "+mystring+"\r\n\\u001B[1B";
                     output += TEXT_RESET;
                     sendMessage(clientSocket,output);
                 }
@@ -267,7 +267,7 @@ void interprate(string mystring, int clientSocket, int index){
         if(!found){
             output = CLEAR_SCREEN;
             output += TEXT_YELLOW;
-            output += "No results that match your query were found.\r\n\u001B[1B";
+            output += "No results that match your query were found.\r\n\\u001B[1B";
             output += TEXT_RESET;
             sendMessage(clientSocket,output);
 
@@ -278,7 +278,7 @@ void interprate(string mystring, int clientSocket, int index){
     }
     else{
         string output = TEXT_RED;
-        output += "Your Query is invalid type 'help' for information about the availabe commands\r\n\u001B[1B";
+        output += "Your Query is invalid type 'help' for information about the availabe commands\r\n\\u001B[1B";
         output += TEXT_RESET;
         sendMessage(clientSocket,output);
         
@@ -362,7 +362,7 @@ int main(int argc , char *argv[])
 			}
             cout<<TEXT_GREEN<<"New connection, the socket fd is: "<< new_socket<<" the IP is: "<<inet_ntoa(address.sin_addr)<<" the port is: "<< ntohs(address.sin_port)<<TEXT_RESET<<endl;
 			//send new connection greeting message
-            string m = "\u001B[2JWelcome to Taku and Thabo server.\r\nCommands Available:\r\nveiw - this shows the contents of the database.\r\nadd name,phone - this adds 'name' and their phone number to the database.\r\nremove name - this removes 'name' from the database.\r\nsearch name - this searches for 'name' and returns the data of 'name'.\r\nhelp - this shows this menu.\r\nquit - quits the server.\r\ninfo - for documentation\r\n";
+            string m = "\\u001B[2JWelcome to Taku and Thabo server.\r\nCommands Available:\r\nveiw - this shows the contents of the database.\r\nadd name,phone - this adds 'name' and their phone number to the database.\r\nremove name - this removes 'name' from the database.\r\nsearch name - this searches for 'name' and returns the data of 'name'.\r\nhelp - this shows this menu.\r\nquit - quits the server.\r\ninfo - for documentation\r\n";
             const char *message = m.c_str(); 
 			if(send(new_socket, message, strlen(message), 0) != strlen(message) )
 			{
@@ -405,7 +405,7 @@ int main(int argc , char *argv[])
                     for(int k=0; k<val; k++){
                         if(buffer[k] == '\n'){
                             processing = true;
-                            test += "\u001B[2J\u001B[1A";
+                            test += "\\u001B[2J\\u001B[1A";
                             //interprate
                             cout<<"Trying to interprate: "<<client_buffer[i]<<endl;
                             interprate(client_buffer[i],socketDecriptor,i);
@@ -415,7 +415,7 @@ int main(int argc , char *argv[])
                     if(!processing){
                         string character = convertToString(buffer,val);
                         client_buffer[i] += character;
-                        test += "\u001B[1B" +character+ "\u001B[1A\u001B[1D";
+                        test += "\\u001B[1B" +character+ "\\u001B[1A\\u001B[1D";
                         const void * mystring = test.c_str();
                         send(socketDecriptor ,  mystring , test.length() , 0 );
                     }
