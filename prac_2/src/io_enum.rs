@@ -12,8 +12,7 @@ impl IOEnum {
                 => format!("Welcome to your address book, {}!\n 
                              Enter `help` to find out available commands :)", name),
             IOEnum::NewUser
-            => format!("Aha, a new user!\n 
-            Might I have a name to call you? -> "),
+            => format!("Aha, a new user!\nMight I have a name to call you? -> "),
             IOEnum::Help => todo!(),
         }
     }
