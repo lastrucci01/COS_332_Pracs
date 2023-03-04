@@ -1,7 +1,7 @@
 mod io_enum;
 mod user_struct;
 
-use std::io::{Read, Write};
+use std::io::{BufRead, BufReader, BufWriter, Read, Write};
 use std::net::{TcpListener, TcpStream};
 
 use std::{fs, thread};
@@ -31,45 +31,43 @@ pub fn handle_incoming_client(mut stream: TcpStream) {
     let client_addr = stream.peer_addr().unwrap().to_string();
     println!("Client {} connected!", &client_addr);
 
+    let mut buf_reader = BufReader::new(&stream);
+    let mut buf_writer = BufWriter::new(&stream);
+
     let user = if is_saved(&client_addr) {
         let user = User::new_from_file(&client_addr);
         let msg = IOEnum::Greeting {
             name: (user.name()),
         }
         .output();
-        stream.write_all(msg.as_bytes()).unwrap();
+        buf_writer.write_all(msg.as_bytes()).unwrap();
+
         user
     } else {
         let msg = IOEnum::NewUser.output();
-        stream.write_all(msg.as_bytes()).unwrap();
+        buf_writer.write_all(msg.as_bytes()).unwrap();
 
-        let mut buffer = [0; 512];
-        stream.read(&mut buffer).unwrap();
-        match stream.read(&mut buffer) {
-            Ok(size) => {
-                let name = String::from_utf8_lossy(&buffer[..size]).trim().to_owned();
-                let user = User::new(name);
-                let msg = IOEnum::Greeting {
-                    name: (user.name()),
-                }
-                .output();
-                stream.write_all(msg.as_bytes()).unwrap();
-                user
-            }
-            Err(e) => {
-                println!("Error - {}", e);
-                panic!()
-            }
+        let mut name = String::new();
+        buf_reader.read_line(&mut name).unwrap();
+
+        let user = User::new(name);
+
+        let msg = IOEnum::Greeting {
+            name: (user.name()),
         }
+        .output();
+        buf_writer.write_all(msg.as_bytes()).unwrap();
+
+        user
     };
 
     let mut buffer = [0; 512];
     loop {
-        match stream.read(&mut buffer) {
+        match buf_reader.read(&mut buffer) {
             Ok(size) => {
                 let message = String::from_utf8_lossy(&buffer[..size]).trim().to_owned();
                 println!("Received message: {}", message);
-                stream.write_all(&buffer[..size]).unwrap();
+                buf_writer.write_all(&buffer[..size]).unwrap();
             }
             Err(e) => {
                 println!("Error: {}", e);
