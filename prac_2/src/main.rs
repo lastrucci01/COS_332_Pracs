@@ -46,6 +46,7 @@ pub fn handle_incoming_client(mut stream: TcpStream) {
         let msg = IOEnum::NewUser.output();
         stream.write_all(msg.as_bytes()).unwrap();
         let name = match stream.read(&mut buffer) {
+            
             Ok(size) => String::from_utf8_lossy(&buffer[0..size]).trim().to_string(),
             Err(_) => panic!()
         };
@@ -63,6 +64,7 @@ pub fn handle_incoming_client(mut stream: TcpStream) {
 
     loop {
         match stream.read(&mut buffer) {
+            Ok(0) => break,
             Ok(size) => {
                 let message = String::from_utf8_lossy(&buffer[..size]).trim().to_owned();
                 println!("Received message: {}", message);
