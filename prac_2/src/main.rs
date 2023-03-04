@@ -31,8 +31,7 @@ pub fn handle_incoming_client(mut stream: TcpStream) {
     let client_addr = stream.peer_addr().unwrap().to_string();
     println!("Client {} connected!", &client_addr);
 
-    let mut buf_reader = BufReader::new(&stream);
-    let mut buf_writer = BufWriter::new(&stream);
+    let mut buffer = [0; 512];
 
     let user = if is_saved(&client_addr) {
         let user = User::new_from_file(&client_addr);
@@ -40,16 +39,16 @@ pub fn handle_incoming_client(mut stream: TcpStream) {
             name: (user.name()),
         }
         .output();
-        buf_writer.write_all(msg.as_bytes()).unwrap();
-        buf_writer.flush().unwrap();
+        stream.write_all(msg.as_bytes()).unwrap();
 
         user
     } else {
         let msg = IOEnum::NewUser.output();
-        buf_writer.write_all(msg.as_bytes()).unwrap();
-
-        let mut name = String::new();
-        buf_reader.read_line(&mut name).unwrap();
+        stream.write_all(msg.as_bytes()).unwrap();
+        let name = match stream.read(&mut buffer) {
+            Ok(size) => String::from_utf8_lossy(&buffer[0..size]).trim().to_string(),
+            Err(_) => panic!()
+        };
 
         let user = User::new(name);
 
@@ -57,20 +56,17 @@ pub fn handle_incoming_client(mut stream: TcpStream) {
             name: (user.name()),
         }
         .output();
-        buf_writer.write_all(msg.as_bytes()).unwrap();
-        buf_writer.flush().unwrap();
+        stream.write_all(msg.as_bytes()).unwrap();
 
         user
     };
 
-    let mut buffer = [0; 512];
     loop {
-        match buf_reader.read(&mut buffer) {
+        match stream.read(&mut buffer) {
             Ok(size) => {
                 let message = String::from_utf8_lossy(&buffer[..size]).trim().to_owned();
                 println!("Received message: {}", message);
-                buf_writer.write_all(&buffer[..size]).unwrap();
-                buf_writer.flush().unwrap();
+                stream.write_all(&buffer[..size]).unwrap();
             }
             Err(e) => {
                 println!("Error: {}", e);
