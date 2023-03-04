@@ -41,6 +41,7 @@ pub fn handle_incoming_client(mut stream: TcpStream) {
         }
         .output();
         buf_writer.write_all(msg.as_bytes()).unwrap();
+        buf_writer.flush().unwrap();
 
         user
     } else {
@@ -57,6 +58,7 @@ pub fn handle_incoming_client(mut stream: TcpStream) {
         }
         .output();
         buf_writer.write_all(msg.as_bytes()).unwrap();
+        buf_writer.flush().unwrap();
 
         user
     };
@@ -68,6 +70,7 @@ pub fn handle_incoming_client(mut stream: TcpStream) {
                 let message = String::from_utf8_lossy(&buffer[..size]).trim().to_owned();
                 println!("Received message: {}", message);
                 buf_writer.write_all(&buffer[..size]).unwrap();
+                buf_writer.flush().unwrap();
             }
             Err(e) => {
                 println!("Error: {}", e);
