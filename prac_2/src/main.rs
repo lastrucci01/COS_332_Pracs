@@ -1,11 +1,10 @@
 mod io_enum;
 mod user_struct;
 
-
-use std::io::{Write, Read};
+use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
-use std::sync::{Arc, Mutex};
-use std::{thread, fs};
+
+use std::{fs, thread};
 
 use crate::io_enum::IOEnum;
 use crate::user_struct::User;
@@ -16,13 +15,10 @@ fn main() {
     let listener = TcpListener::bind(String::from(":::") + PORT_NO).unwrap();
     println!("Server running on port {}...", PORT_NO);
 
-
     for stream in listener.incoming() {
         match stream {
             Ok(stream) => {
-                thread::spawn(move || {                    
-                   handle_incoming_client(stream)
-                });
+                thread::spawn(move || handle_incoming_client(stream));
             }
             Err(e) => {
                 println!("Connection failed: {}", e);
@@ -46,27 +42,34 @@ pub fn handle_incoming_client(mut stream: TcpStream) {
     } else {
         let msg = IOEnum::NewUser.output();
         stream.write_all(msg.as_bytes()).unwrap();
-        let mut name = String::new();
-        stream.read_to_string(&mut name).unwrap();
-        let user = User::new_from_file(&client_addr);
-        let msg = IOEnum::Greeting {
-            name: (user.name()),
+
+        let mut buffer = [0; 512];
+        stream.read(&mut buffer).unwrap();
+        match stream.read(&mut buffer) {
+            Ok(size) => {
+                let name = String::from_utf8_lossy(&buffer[..size]).trim().to_owned();
+                let user = User::new(name);
+                let msg = IOEnum::Greeting {
+                    name: (user.name()),
+                }
+                .output();
+                stream.write_all(msg.as_bytes()).unwrap();
+                user
+            }
+            Err(e) => {
+                println!("Error - {}", e);
+                panic!()
+            }
         }
-        .output();
-        stream.write_all(msg.as_bytes()).unwrap();
-        user
     };
 
     let mut buffer = [0; 512];
     loop {
         match stream.read(&mut buffer) {
-            Ok(n) => {
-                if n == 0 {
-                    break;
-                }
-                let message = String::from_utf8_lossy(&buffer[..n]);
+            Ok(size) => {
+                let message = String::from_utf8_lossy(&buffer[..size]).trim().to_owned();
                 println!("Received message: {}", message);
-                stream.write_all(&buffer[..n]).unwrap();
+                stream.write_all(&buffer[..size]).unwrap();
             }
             Err(e) => {
                 println!("Error: {}", e);
@@ -76,7 +79,7 @@ pub fn handle_incoming_client(mut stream: TcpStream) {
     }
 }
 
-pub fn is_saved( client_addr: &String) -> bool {
+pub fn is_saved(client_addr: &String) -> bool {
     let mut base_path = std::env::current_exe()
         .unwrap()
         .parent()
