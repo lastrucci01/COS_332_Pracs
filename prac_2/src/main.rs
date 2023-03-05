@@ -1,9 +1,7 @@
-mod io_enum;
-mod user_struct;
 mod helpers;
-mod error_enum;
+mod user_struct;
 
-use std::net::{TcpListener};
+use std::net::TcpListener;
 
 use std::{fs, thread};
 
@@ -26,4 +24,3 @@ fn main() {
         }
     }
 }
-
