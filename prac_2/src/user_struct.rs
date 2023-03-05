@@ -16,7 +16,7 @@ impl User {
 
     pub fn name(&self) -> String { (&self.name).to_string() }
 
-    pub fn add_contact(&self, name: String, telephone: String) {
+    pub fn add_contact(&self, name: &str, telephone: &str) {
 
     }
 
@@ -25,6 +25,10 @@ impl User {
     }
 
     pub fn remove_contact(&self, name: String) {
+
+    }
+
+    pub fn save_to_file(&self) {
 
     }
     
