@@ -3,7 +3,7 @@ mod user_struct;
 
 use std::net::TcpListener;
 
-use std::{fs, thread};
+use std::{thread};
 
 use crate::helpers::handle_incoming_client;
 

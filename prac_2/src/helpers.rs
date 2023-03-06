@@ -9,15 +9,21 @@ use regex::Regex;
 use crate::user_struct::User;
 
 pub fn handle_incoming_client(mut stream: TcpStream) {
-    let client_addr = stream.peer_addr().unwrap().to_string();
-    println!("Client {} connected!", &client_addr);
-
     let mut buffer = [0; 512];
 
-    let mut user = if is_saved(&client_addr) {
-        let user = User::new_from_file(&client_addr);
+    let msg = format!(
+                "Welcome to the telephone book!\nType your username to log in or simply press enter to create an account :)\r\n",
+            );
+    stream.write_all(msg.as_bytes()).unwrap();
+    let input = match stream.read(&mut buffer) {
+        Ok(size) => String::from_utf8_lossy(&buffer[0..size]).trim().to_string(),
+        Err(_) => panic!(),
+    };
+
+    let mut user = if !input.is_empty() {
+        let user = User::new_from_file(&input);
         let msg = format!(
-            "Welcome to your address book, {}!\nEnter `help` to find out available commands :)\r\n",
+            "Welcome back, {}!\nEnter `help` to find out available commands :)\r\n",
             user.name()
         );
         stream.write_all(msg.as_bytes()).unwrap();
@@ -26,17 +32,25 @@ pub fn handle_incoming_client(mut stream: TcpStream) {
     } else {
         let msg = format!("Aha, a new user!\nMight I have a name to call you? -> ");
         stream.write_all(msg.as_bytes()).unwrap();
-        let name = match stream.read(&mut buffer) {
-            Ok(size) => String::from_utf8_lossy(&buffer[0..size]).trim().to_string(),
-            Err(_) => panic!(),
+        let username = loop {
+            let possible_username = match stream.read(&mut buffer) {
+                Ok(size) => String::from_utf8_lossy(&buffer[0..size]).trim().to_string(),
+                Err(_) => panic!(),
+            };
+            if !search_users(&possible_username) {
+                break possible_username;
+            } else {
+                let msg = format!("That username is taken, perhaps another one? ->",);
+                stream.write_all(msg.as_bytes()).unwrap();
+            }
         };
 
-        let user = User::new(name, client_addr);
+        let user = User::new(username);
 
         let msg = format!(
-            "Welcome to your address book, {}!\nEnter `help` to find out available commands :)\r\n",
-            user.name()
-        );
+                "Welcome to your telephone book, {}!\nEnter `help` to find out available commands :)\r\n",
+                user.name()
+            );
         stream.write_all(msg.as_bytes()).unwrap();
 
         user
@@ -47,12 +61,6 @@ pub fn handle_incoming_client(mut stream: TcpStream) {
             Ok(0) => break,
             Ok(size) => {
                 let message = String::from_utf8_lossy(&buffer[..size]).trim().to_owned();
-                println!(
-                    "Received message from client {}: {}",
-                    stream.peer_addr().unwrap(),
-                    message
-                );
-
                 let commands = tokenise(&message);
 
                 if commands.len() > 0 {
@@ -92,14 +100,16 @@ pub fn handle_incoming_client(mut stream: TcpStream) {
                         }
                         "help" => {
                             format!(
-                                r#"available commands:\r\nadd <name> <number> -> add a contact to your telephone book\r\nsearch <name> -> search for a contact in your telephone\r\nremove <name> -> remove a contact from your telephone book\r\nhelp -> this command!\r\nquit -> exit the address book application\r\n"#
+                                "available commands:\r\nadd <name> <number> -> add a contact to your telephone book\r\nsearch <name> -> search for a contact in your telephone\r\nremove <name> -> remove a contact from your telephone book\r\nhelp -> this command!\r\nquit -> exit the address book application\r\n"
                             )
                         }
                         "quit" => {
                             user.save_to_file();
-                            let response = format!("Thanks for using the telephone book!\r\nSee you soon!\r\n");
+                            let response = format!(
+                                "Thanks for using the telephone book!\r\nSee you soon!\r\n"
+                            );
                             stream.write(response.as_bytes()).unwrap();
-                            break
+                            break;
                         }
                         _ => {
                             format!("unrecognised command: {}\r\n", message)
@@ -135,21 +145,13 @@ fn tokenise(message: &str) -> Vec<&str> {
     command
 }
 
-fn is_saved(client_addr: &String) -> bool {
-    let mut base_path = std::env::current_exe()
-        .unwrap()
-        .parent()
-        .unwrap()
-        .to_path_buf();
-    base_path.push("users");
-    let user_paths = fs::read_dir(base_path.to_str().clone().unwrap()).unwrap();
-
-    for path in user_paths {
-        if let Ok(dir) = path {
-            let file_name = dir.file_name().to_str().unwrap().to_string();
-
-            println!("{:?}", file_name);
-            return file_name == format!("{}.txt", client_addr);
+fn search_users(name: &str) -> bool {
+    for entry in fs::read_dir(".").unwrap() {
+        let entry = entry.ok().unwrap();
+        let file_name = entry.file_name();
+        let file_name_str = file_name.to_string_lossy();
+        if file_name_str.contains(name) {
+            return true;
         }
     }
     false

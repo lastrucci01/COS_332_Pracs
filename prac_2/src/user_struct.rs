@@ -1,25 +1,32 @@
-use core::num;
-use std::{collections::HashMap, fmt::format, path::Path, fs::File, io::Write};
+use std::{collections::HashMap, fs::File, io::{Write, BufReader, BufRead}};
 
-use serde_json::to_string;
+
 
 pub struct User {
-    client_addr: String,
     name: String,
     address_book: HashMap<String, String>,
 }
 
 impl User {
-    pub fn new(name: String, client_addr: String) -> Self {
+    pub fn new(name: String) -> Self {
         Self {
             name,
-            client_addr,
             address_book: HashMap::new(),
         }
     }
 
-    pub fn new_from_file(client_addr: &String) -> Self {
-        todo!()
+    pub fn new_from_file(name: &String) -> Self {
+        let path = format!("{}.txt", name);
+        let user_file = File::open(path).unwrap();
+        let reader = BufReader::new(user_file);
+        let mut temp_book = HashMap::new();
+        for line in reader.lines() {
+            let line = line.unwrap();
+            let parts: Vec<_> = line.split(",").collect();
+            temp_book.insert(String::from(parts[0]), String::from(parts[1]));
+        }
+
+        Self { name: String::from(name), address_book: temp_book }
     }
 
     pub fn name(&self) -> String {
@@ -47,14 +54,22 @@ impl User {
     }
 
     pub fn save_to_file(&self) {
-        let header = format!("{}\n",&self.name);
-        let data = to_string(&self.address_book).unwrap();
-
-        let file_name = format!("{}.txt",&self.client_addr);
+        let file_name = format!("{}.txt",&self.name);
 
         let mut file = File::create(file_name).expect("failed to create user file...");
 
-        file.write(header.as_bytes()).unwrap();
+        if self.address_book.is_empty() {
+            return
+        }
+
+        let mut data = String::from("");
+
+        for (name, tel) in &self.address_book {
+             let part = format!("{},{}\n", name, tel);
+             data.push_str(&part);
+        }
+
+
         file.write(data.as_bytes()).unwrap();
     }
 }

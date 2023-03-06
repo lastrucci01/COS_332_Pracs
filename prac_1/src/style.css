@@ -1,0 +1,86 @@
+html {
+  height: 100vh;
+  width: 100%;
+  font-family: 'Courier New', Courier, monospace
+}
+
+main {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* Style for the header container */
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 99%;
+  background-color: #333;
+  color: #fff;
+  padding: 20px;
+}
+
+/* Style for the header title */
+header h1 {
+  margin: 0;
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 99%;
+  background-color: #333;
+  color: #fff;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+}
+
+
+footer p {
+  padding-right: 15px; 
+  margin: 10px 0;
+}
+
+.main_div {
+  height: 100%;
+}
+
+.message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-size: 25px;
+  height: 50%;
+}
+
+.message a {
+  color: black;
+}
+.message a:hover {
+  border: 10px;
+  border-color: red;
+  padding: 5px;
+  background-color: black;
+  color: white;
+}
+
+.wrong {
+  color: white;
+  background-color: #7b1114;
+}
+
+.right {
+  color: white;
+  background-color: #2f4c39;
+}
