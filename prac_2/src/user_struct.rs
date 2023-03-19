@@ -1,6 +1,9 @@
-use std::{collections::HashMap, fs::File, io::{Write, BufReader, BufRead}};
-
-
+use core::num;
+use std::{
+    collections::HashMap,
+    fs::File,
+    io::{BufRead, BufReader, Write},
+};
 
 pub struct User {
     name: String,
@@ -26,16 +29,29 @@ impl User {
             temp_book.insert(String::from(parts[0]), String::from(parts[1]));
         }
 
-        Self { name: String::from(name), address_book: temp_book }
+        Self {
+            name: String::from(name),
+            address_book: temp_book,
+        }
     }
 
     pub fn name(&self) -> String {
         (&self.name).to_string()
     }
 
-    pub fn add_contact(&mut self, name: &str, telephone: &str) {
+    pub fn add_contact(&mut self, name: &str, number: &str) {
         self.address_book
-            .insert(String::from(name), String::from(telephone));
+            .insert(String::from(name), String::from(number));
+    }
+
+    pub fn update_contact(&mut self, name: &str, number: &str) -> String {
+        if self.address_book.contains_key(name) {
+            self.address_book
+                .insert(String::from(name), String::from(number));
+            format!("{} has been updated with the number -> {}", name, number)
+        } else {
+            format!("{} cannot be updated; they don't exist", name)
+        }
     }
 
     pub fn search_contact(&self, name: &str) -> String {
@@ -46,29 +62,28 @@ impl User {
         }
     }
 
-    pub fn remove_contact(&mut self, name: &str) -> String{
+    pub fn remove_contact(&mut self, name: &str) -> String {
         match self.address_book.remove(name) {
             Some(_) => format!("Number removed for: {}\r\n", name),
-            None => format!("No number found for name\r\n")
+            None => format!("No number found for name\r\n"),
         }
     }
 
     pub fn save_to_file(&self) {
-        let file_name = format!("{}.txt",&self.name);
+        let file_name = format!("{}.txt", &self.name);
 
         let mut file = File::create(file_name).expect("failed to create user file...");
 
         if self.address_book.is_empty() {
-            return
+            return;
         }
 
         let mut data = String::from("");
 
         for (name, tel) in &self.address_book {
-             let part = format!("{},{}\n", name, tel);
-             data.push_str(&part);
+            let part = format!("{},{}\n", name, tel);
+            data.push_str(&part);
         }
-
 
         file.write(data.as_bytes()).unwrap();
     }
