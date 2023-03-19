@@ -1,4 +1,3 @@
-use core::num;
 use std::{
     collections::HashMap,
     fs::File,
@@ -48,9 +47,9 @@ impl User {
         if self.address_book.contains_key(name) {
             self.address_book
                 .insert(String::from(name), String::from(number));
-            format!("{} has been updated with the number -> {}", name, number)
+            format!("{} has been updated with the number -> {}\n", name, number)
         } else {
-            format!("{} cannot be updated; they don't exist", name)
+            format!("{} cannot be updated; they don't exist\n", name)
         }
     }
 
@@ -67,6 +66,19 @@ impl User {
             Some(_) => format!("Number removed for: {}\r\n", name),
             None => format!("No number found for name\r\n"),
         }
+    }
+
+    pub fn list(&self) -> String {
+        if self.address_book.is_empty() {
+            return format!("Telephone book empty; add some contacts!\n");
+        }
+
+        let mut out = String::new();
+        for (name, number) in &self.address_book {
+            let partial = format!("{} - {}\n", name, number);
+            out.push_str(&partial);
+        }
+        out
     }
 
     pub fn save_to_file(&self) {

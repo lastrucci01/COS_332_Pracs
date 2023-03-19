@@ -12,8 +12,11 @@ pub fn handle_incoming_client(mut stream: TcpStream) {
     let mut buffer = [0; 512];
 
     let msg = format!(
-                "Welcome to the telephone book!\nType your username to log in or simply press enter to create an account :)\r\n",
-            );
+        "{}Welcome to the telephone book!{}\nType your username to log in or simply press enter to create an account :)\r\n{}",
+        "\x1B[1m\x1B[4m", // bold and underlined
+        "\x1B[0m", // reset
+        "\x1B[32m", // green
+    );
     stream.write_all(msg.as_bytes()).unwrap();
     let input = match stream.read(&mut buffer) {
         Ok(size) => String::from_utf8_lossy(&buffer[0..size]).trim().to_string(),
@@ -23,14 +26,24 @@ pub fn handle_incoming_client(mut stream: TcpStream) {
     let mut user = if !input.is_empty() {
         let user = User::new_from_file(&input);
         let msg = format!(
-            "Welcome back, {}!\nEnter `help` to find out available commands :)\r\n",
-            user.name()
+            "{}{}Welcome back, {}!{}\n{}Enter `help` to find out available commands :){}\r\n",
+            "\x1B[0m", // reset
+            "\x1B[1m", // bold
+            user.name(),
+            "\x1B[0m",  // reset
+            "\x1B[32m", // green
+            "\x1B[0m",  // reset
         );
         stream.write_all(msg.as_bytes()).unwrap();
 
         user
     } else {
-        let msg = format!("Aha, a new user!\nMight I have a name to call you? -> ");
+        let msg = format!(
+            "{}{}Aha, a new user!{}\nMight I have a name to call you? -> ",
+            "\x1B[0m",  // reset
+            "\x1B[33m", // yellow
+            "\x1B[0m",  // reset
+        );
         stream.write_all(msg.as_bytes()).unwrap();
         let username = loop {
             let possible_username = match stream.read(&mut buffer) {
@@ -48,8 +61,13 @@ pub fn handle_incoming_client(mut stream: TcpStream) {
         let user = User::new(username);
 
         let msg = format!(
-                "Welcome to your telephone book, {}!\nEnter `help` to find out available commands :)\r\n",
-                user.name()
+                "{}{}Welcome to your telephone book, {}!{}\n{}Enter `help` to find out available commands :){}\r\n",
+                "\x1B[0m", // reset
+                "\x1B[1m", // bold
+                user.name(),
+                "\x1B[0m",  // reset
+                "\x1B[32m", // green
+                "\x1B[0m",  // reset
             );
         stream.write_all(msg.as_bytes()).unwrap();
 
@@ -67,7 +85,7 @@ pub fn handle_incoming_client(mut stream: TcpStream) {
                     let response: String = match commands[0] {
                         "add" => {
                             if commands.len() != 3 {
-                                format!("Two arguments (name, number) required for `add`\r\n")
+                                format!("Two args (name, number) required for `add`\r\n")
                             } else if is_not_name(commands[1]) {
                                 format!("Incorrect format for `name` arg \r\n")
                             } else if is_not_number(commands[2]) {
@@ -78,6 +96,15 @@ pub fn handle_incoming_client(mut stream: TcpStream) {
                                     "{} successfully added to your telephone book!\r\n",
                                     commands[1]
                                 )
+                            }
+                        }
+                        "update" => {
+                            if commands.len() != 3 {
+                                format!("Two arguments (name, number) required for `update`\r\n")
+                            } else if is_not_name(commands[1]) {
+                                format!("Incorrect format for `name` arg \r\n")
+                            } else {
+                                user.update_contact(commands[1], commands[2])
                             }
                         }
                         "search" => {
@@ -93,14 +120,38 @@ pub fn handle_incoming_client(mut stream: TcpStream) {
                             if commands.len() != 2 {
                                 format!("One argument (name) required for `search`\r\n")
                             } else if is_not_name(commands[1]) {
-                                format!("Incorrect format for `name` arg \r\n")
+                                format!("Incorrect format for `name` arg\r\n",)
                             } else {
                                 user.remove_contact(commands[1])
                             }
                         }
+                        "list" => user.list(),
                         "help" => {
                             format!(
-                                "available commands:\r\nadd <name> <number> -> add a contact to your telephone book\r\nsearch <name> -> search for a contact in your telephone\r\nremove <name> -> remove a contact from your telephone book\r\nhelp -> this command!\r\nquit -> exit the address book application\r\n"
+                                "{}available commands:{}\r\n{}add <name> <number>{} -> add a contact to your telephone book\r\n{}update <name> <number>{} -> update a contact in your telephone book\r\n{}search <name>{} -> search for a contact in your telephone\r\n{}remove <name>{} -> remove a contact from your telephone book\r\n{}list{} -> list telephone book!\r\n{}help{} -> this command!\r\n{}quit{} -> exit the address book application\r\n",
+                                "\x1B[1m", // bold
+                                "\x1B[0m", // reset
+
+                                "\x1B[32m", // green
+                                "\x1B[0m", // reset
+
+                                "\x1B[32m", // green
+                                "\x1B[0m", // reset
+
+                                "\x1B[33m", // yellow
+                                "\x1B[0m", // reset
+
+                                "\x1B[34m", // blue
+                                "\x1B[0m", // reset
+
+                                "\x1B[35m", // magenta
+                                "\x1B[0m", // reset
+
+                                "\x1B[36m", // cyan
+                                "\x1B[0m", // reset
+
+                                "\x1B[31m", // red
+                                "\x1B[0m", // reset
                             )
                         }
                         "quit" => {
