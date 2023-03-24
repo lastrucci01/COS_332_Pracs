@@ -157,7 +157,11 @@ pub fn handle_incoming_client(mut stream: TcpStream) {
                         "quit" => {
                             user.save_to_file();
                             let response = format!(
-                                "Thanks for using the telephone book!\r\nSee you soon!\r\n"
+                                "{}Thanks for using the telephone book!{}\r\n{}See you soon!{}\r\n",
+                                "\x1B[1m",  // bold
+                                "\x1B[0m",  // reset
+                                "\x1B[33m", // yellow
+                                "\x1B[0m",  // reset
                             );
                             stream.write(response.as_bytes()).unwrap();
                             break;
