@@ -162,6 +162,9 @@ pub fn handle_incoming_client(mut stream: TcpStream) {
                             stream.write(response.as_bytes()).unwrap();
                             break;
                         }
+                        "clear" => {
+                            format!("\x1B[2J\x1B[1;1H")
+                        }
                         _ => {
                             format!("unrecognised command: {}\r\n", message)
                         }
