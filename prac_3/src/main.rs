@@ -5,7 +5,7 @@ use chrono::{DateTime, Datelike, Timelike};
 use regex::Regex;
 use std::borrow::Cow;
 use std::fs::File;
-use std::io::{Read, Write};
+use std::io::{Read, Write, BufReader, BufRead};
 use std::net::{TcpListener, TcpStream};
 use std::{env, thread};
 use tera::{Context, Tera};
@@ -15,15 +15,38 @@ use crate::api::fetch_city;
 static CITIES: [&str; 5] = ["joburg", "london", "new_york", "shanghai", "moscow"];
 
 fn handle_client(mut stream: TcpStream) {
-    let mut buffer = [0; 1024];
-    stream.read(&mut buffer).unwrap();
-    let request = String::from_utf8_lossy(&buffer[..]);
-    dbg!(request.clone());
 
-    let response = handle_request(request);
+    let mut reader = BufReader::new(stream);
 
-    stream.write(response.as_bytes()).unwrap();
-    stream.flush().unwrap();
+    loop {
+        let mut buffer = String::new();
+
+        // Read the incoming data into a buffer
+        match reader.read_line(&mut buffer) {
+            Ok(0) => break, // Connection was closed
+            Ok(_) => {
+                // Decode the incoming data
+                match buffer.trim().as_bytes() {
+                    _ => {
+                        println!("Received some other data: {}", buffer);
+                    }
+                }
+            }
+            Err(error) => {
+                println!("Error reading from socket: {}", error);
+                break;
+            }
+        }
+    }
+    
+    // let mut buffer = [0; 1024];
+    // stream.read(&mut buffer).unwrap();/
+    // let request = String::from_utf8_lossy(&buffer[..]);
+
+    // let response = handle_request(request);
+
+    // stream.write(response.as_bytes()).unwrap();
+    // stream.flush().unwrap();
 }
 
 fn get_contents(path: &str) -> String {
