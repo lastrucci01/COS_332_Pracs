@@ -55,7 +55,7 @@ fn handle_request(request: Cow<str>) -> String {
 
             let response_body = render_html("index.html", context);
             format!(
-                "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: {}\r\n\r\n{}",
+                "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: {}\r\n\r\n{}",
                 response_body.len(),
                 response_body
             )
