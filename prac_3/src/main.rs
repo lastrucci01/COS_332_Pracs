@@ -15,6 +15,7 @@ use crate::api::fetch_city;
 static CITIES: [&str; 5] = ["joburg", "london", "new_york", "shanghai", "moscow"];
 
 fn handle_client(mut stream: TcpStream) {
+    println!("HANDLING THE CLIENT");
     let mut buffer = [0; 1024];
     stream.read(&mut buffer).unwrap();
     let request = String::from_utf8_lossy(&buffer[..]);
@@ -38,6 +39,7 @@ fn get_contents(path: &str) -> String {
 }
 
 fn handle_request(request: Cow<str>) -> String {
+    println!("HANDLING REQ");
     let mut parts = request.trim().split_whitespace();
     let method = parts.next().unwrap();
     let path = parts.next().unwrap().trim_start_matches('/');
