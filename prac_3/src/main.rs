@@ -5,7 +5,7 @@ use chrono::{DateTime, Datelike, Timelike};
 use regex::Regex;
 use std::borrow::Cow;
 use std::fs::File;
-use std::io::{BufRead, BufReader, Read, Write};
+use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
 use std::{env, thread};
 use tera::{Context, Tera};
@@ -15,19 +15,14 @@ use crate::api::fetch_city;
 static CITIES: [&str; 5] = ["joburg", "london", "new_york", "shanghai", "moscow"];
 
 fn handle_client(mut stream: TcpStream) {
-    let mut buffer = [0; 512];
+    let mut buffer = [0; 1024];
     stream.read(&mut buffer).unwrap();
-
     let request = String::from_utf8_lossy(&buffer[..]);
-    println!("Received request: {}", request);
-    // let mut buffer = [0; 1024];
-    // stream.read(&mut buffer).unwrap();/
-    // let request = String::from_utf8_lossy(&buffer[..]);
 
-    // let response = handle_request(request);
+    let response = handle_request(request);
 
-    // stream.write(response.as_bytes()).unwrap();
-    // stream.flush().unwrap();
+    stream.write(response.as_bytes()).unwrap();
+    stream.flush().unwrap();
 }
 
 fn get_contents(path: &str) -> String {
