@@ -16,29 +16,28 @@ static CITIES: [&str; 5] = ["joburg", "london", "new_york", "shanghai", "moscow"
 
 fn handle_client(mut stream: TcpStream) {
 
-    let mut reader = BufReader::new(stream);
+    let mut buffer = [0; 1024];
+    let mut stream = stream;
 
     loop {
-        let mut buffer = String::new();
-
-        // Read the incoming data into a buffer
-        match reader.read_line(&mut buffer) {
-            Ok(0) => break, // Connection was closed
-            Ok(_) => {
-                // Decode the incoming data
-                match buffer.trim().as_bytes() {
-                    _ => {
-                        println!("Received some other data: {}", buffer);
-                    }
+        match stream.read(&mut buffer) {
+            Ok(n) if n > 0 => {
+                // Attempt to decode the incoming data as UTF-8
+                match std::str::from_utf8(&buffer[0..n]) {
+                    Ok(s) => println!("Received data: {}", s),
+                    Err(e) => println!("Failed to decode incoming data as UTF-8: {}", e),
                 }
             }
-            Err(error) => {
-                println!("Error reading from socket: {}", error);
+            Ok(_) => {
+                // Connection was closed
+                break;
+            }
+            Err(e) => {
+                println!("Error reading from socket: {}", e);
                 break;
             }
         }
     }
-    
     // let mut buffer = [0; 1024];
     // stream.read(&mut buffer).unwrap();/
     // let request = String::from_utf8_lossy(&buffer[..]);
