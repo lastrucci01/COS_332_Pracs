@@ -203,7 +203,7 @@ fn render_html(file_name: &str, context: Context) -> String {
 }
 
 fn main() {
-    let listener = TcpListener::bind("34.249.78.103:6969").unwrap();
+    let listener = TcpListener::bind("0.0.0.0:6969").unwrap();
     let address = listener.local_addr().expect("Failed to get address");
     println!("Server listening on http://{}", address);
     for stream in listener.incoming() {
