@@ -15,10 +15,10 @@ use crate::api::fetch_city;
 static CITIES: [&str; 5] = ["joburg", "london", "new_york", "shanghai", "moscow"];
 
 fn handle_client(mut stream: TcpStream) {
-    println!("HANDLING THE CLIENT");
     let mut buffer = [0; 1024];
     stream.read(&mut buffer).unwrap();
     let request = String::from_utf8_lossy(&buffer[..]);
+    dbg!(request.clone());
 
     let response = handle_request(request);
 
