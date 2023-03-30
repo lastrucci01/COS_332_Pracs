@@ -177,10 +177,9 @@ fn render_html(file_name: &str, context: Context) -> String {
 
     tera.unwrap().render(&file_name, &context).unwrap()
 }
-static PORT_NO: &str = "6969";
 
 fn main() {
-    let listener = TcpListener::bind(String::from(":::") + PORT_NO).unwrap();
+    let listener = TcpListener::bind("127.0.0.1:6969").unwrap();
 
     for stream in listener.incoming() {
         match stream {
