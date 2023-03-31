@@ -1,5 +1,4 @@
 mod api;
-mod formatting;
 
 use chrono::{DateTime, Datelike, Timelike};
 use regex::Regex;
