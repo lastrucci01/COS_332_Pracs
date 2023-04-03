@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Appointment Book</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+    <header>
+        <h1>Appointment Book</h1>
+        <form action="logout">
+            <button class="logout">Logout</button>
+        </form>
+    </header>
+
+    <div class="main_box">
+        <h2> Hey {{ username }}!</h2>
+        <h3> Welcome to your Appointment book! </h3>
+
+    </div>
+
+    <div class="horiz_divider"></div>
+
+    <div class="main_box">
+        {% if appointments %}
+        <h2>Appointments</h2>
+        <button class="add_appointment" onclick="openPopup()">Add Appointment</button>
+        <ul class="appointment_list">
+            {% for date, name in appointments %}
+            <li class="appointment">
+                <span class="appointment_date">{{ date }}</span>
+                <span class="appointment_description">{{ name }}</span>
+                <a href="#" class="edit_appointment"><i class="fa fa_pencil"></i></a>
+                <a href="#" class="delete_appointment"><i class="fa fa_trash"></i></a>
+                </span>
+            </li>
+            {% endfor %}
+        </ul>
+
+
+        {% else %}
+        <h2>
+            Start by adding some appointments!
+        </h2>
+        <button class="add_appointment" onclick="openPopup()">
+            Add Appointment
+        </button>
+        {% endif %}
+    </div>
+
+    <div class="main_box">
+        <div class="popup" id="appointment-popup">
+            <form method="POST" action="add_appointment">
+                <label for="name">Appointment Name:</label>
+                <input type="text" id="name" name="name">
+                <br><br>
+                <label for="date">Appointment Date:</label>
+                <input type="date" id="date" name="date">
+                <br><br>
+                <input type="submit" value="Add">
+                <button onclick="closePopup()">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-left">
+            <p>COS 332</p>
+        </div>
+        <div class="footer-right">
+            <p>Richard Lastrucci(20430168) & Thabo Chesane(20507102)</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
