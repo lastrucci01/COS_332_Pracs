@@ -75,7 +75,7 @@ pub fn signup_post(username: &str, redis_mutex: &mut Mutex<Client>) -> String {
         let mut headers = get_basic_headers(&response_body, "html");
 
         headers.insert("Set-cookie".to_owned(), format!("name={}", user.username()));
-        headers.insert("Location".to_owned(), "/appointments".to_owned());
+        headers.insert("Location".to_owned(), "/".to_owned());
 
         format_response(response_body, headers, "200")
     } else {
