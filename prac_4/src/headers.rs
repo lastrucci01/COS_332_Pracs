@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 
-
 pub fn format_response(
     response_body: String,
     headers: HashMap<String, String>,
@@ -15,7 +14,6 @@ pub fn format_response(
             header_string.push_str("\r\n")
         }
     }
-
 
     format!("{}\r\n\r\n{}", header_string, response_body)
 }
@@ -41,10 +39,7 @@ fn build_header(header: (String, String)) -> String {
     }
 }
 
-pub fn get_basic_headers(
-    response_body: &str,
-    content_type: &str,
-) -> HashMap<String, String> {
+pub fn get_basic_headers(response_body: &str, content_type: &str) -> HashMap<String, String> {
     let mut headers: HashMap<String, String> = HashMap::new();
 
     headers.insert(
@@ -61,4 +56,16 @@ pub fn get_basic_headers(
         },
     );
     headers
+}
+
+pub fn get_username(cookie_str: &str) -> Option<String> {
+    let cookies: Vec<&str> = cookie_str.split(';').collect();
+    cookies.iter().find_map(|cookie| {
+        let parts: Vec<&str> = cookie.split('=').map(str::trim).collect();
+
+        match parts.as_slice() {
+            ["name", value] => Some(value.to_string()),
+            _ => None,
+        }
+    })
 }

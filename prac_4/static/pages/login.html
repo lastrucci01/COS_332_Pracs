@@ -14,9 +14,10 @@
   <div class="main_box">
     <h2>Login</h2>
     <div class="login_box">
-      <form method="post" action="login">
+      <form method="post">
         <div class="form-group">
           <label for="username">Username</label>
+          <input type="hidden" name="type" value="login">
           <input type="text" id="login" name="login" required>
         </div>
         <button type="submit">Log In</button>
@@ -27,16 +28,8 @@
   <div class="horiz_divider"></div>
 
   <div class="main_box">
-    <h2>Sign Up</h2>
-    <div class="login_box">
-      <form method="post" action="signup">
-        <div class="form-group">
-          <label for="username">Username</label>
-          <input type="text" id="signup" name="signup" required>
-        </div>
-        <button type="submit">Sign Up</button>
-      </form>
-    </div>
+    <h2>Don't have an account?</h2>
+    <a href="signup">Sign Up!</a>
   </div>
 
 

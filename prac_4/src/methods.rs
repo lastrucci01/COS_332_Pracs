@@ -1,9 +1,6 @@
-use std::{
-    collections::{BTreeMap, HashMap},
-    sync::Mutex,
-};
+use std::{collections::HashMap, sync::Mutex};
 
-use chrono::{DateTime, NaiveDate, Utc};
+use chrono::NaiveDate;
 use redis::Client;
 use tera::Context;
 use uuid::Uuid;
@@ -35,7 +32,6 @@ pub fn home() -> String {
 
 pub fn login(username: &str, redis_mutex: &mut Mutex<Client>) -> String {
     let user = User::read_user(username, redis_mutex);
-
     if let Some(user) = user {
         let context = if user.appointments().is_empty() {
             let mut context = Context::new();
@@ -44,34 +40,7 @@ pub fn login(username: &str, redis_mutex: &mut Mutex<Client>) -> String {
         } else {
             let mut context = Context::new();
             context.insert("username", &user.username());
-
-            let appointments_hash = user.appointments();
-            let appointments_unix: HashMap<i64, String> =
-                appointments_hash
-                    .values()
-                    .fold(HashMap::new(), |mut acc, (date, name)| {
-                        acc.insert(*date, name.to_string());
-                        acc
-                    });
-            let mut sorted_map: BTreeMap<i64, String> = BTreeMap::new();
-            for key in appointments_unix.keys() {
-                let value = appointments_unix.get(key).unwrap();
-                sorted_map.insert(*key, value.to_string());
-            }
-            let appointments = sorted_map
-                .iter()
-                .map(|(date, name)| {
-                    let datetime = DateTime::<Utc>::from_utc(
-                        chrono::NaiveDateTime::from_timestamp_opt(*date, 0).unwrap(),
-                        Utc,
-                    );
-
-                    let formatted_date = datetime.format("%d-%m-%y").to_string();
-
-                    (formatted_date, name.to_string())
-                })
-                .collect::<BTreeMap<String, String>>();
-
+            let appointments = user.appointments();
             context.insert("appointments", &appointments);
             context
         };
@@ -80,7 +49,7 @@ pub fn login(username: &str, redis_mutex: &mut Mutex<Client>) -> String {
         let mut headers = get_basic_headers(&response_body, "html");
 
         headers.insert("Set-cookie".to_owned(), format!("name={}", user.username()));
-        headers.insert("Location".to_owned(), "/appointments".to_owned());
+        headers.insert("Location".to_owned(), "/".to_owned());
 
         format_response(response_body, headers, "200")
     } else {
@@ -88,7 +57,14 @@ pub fn login(username: &str, redis_mutex: &mut Mutex<Client>) -> String {
     }
 }
 
-pub fn signup(username: &str, redis_mutex: &mut Mutex<Client>) -> String {
+pub fn signup_get() -> String {
+    let response_body = get_contents("static/pages/signup.html");
+    let headers = get_basic_headers(&response_body, "html");
+
+    format_response(response_body, headers, "200")
+}
+
+pub fn signup_post(username: &str, redis_mutex: &mut Mutex<Client>) -> String {
     let user = User::new_user(username, redis_mutex);
 
     if let Some(user) = user {
@@ -107,9 +83,7 @@ pub fn signup(username: &str, redis_mutex: &mut Mutex<Client>) -> String {
     }
 }
 
-pub fn appointments(username: &str, redis_mutex: &mut Mutex<Client>) -> String {
-    let user = User::read_user(username, redis_mutex).unwrap();
-
+pub fn appointments(user: User) -> String {
     let context = if user.appointments().is_empty() {
         let mut context = Context::new();
         context.insert("username", &user.username());
@@ -118,33 +92,8 @@ pub fn appointments(username: &str, redis_mutex: &mut Mutex<Client>) -> String {
         let mut context = Context::new();
         context.insert("username", &user.username());
 
-        let appointments_hash = user.appointments();
-        let appointments_unix: HashMap<i64, String> =
-            appointments_hash
-                .values()
-                .fold(HashMap::new(), |mut acc, (date, name)| {
-                    acc.insert(*date, name.to_string());
-                    acc
-                });
-        let mut sorted_map: BTreeMap<i64, String> = BTreeMap::new();
-        for key in appointments_unix.keys() {
-            let value = appointments_unix.get(key).unwrap();
-            sorted_map.insert(*key, value.to_string());
-        }
-        let appointments = sorted_map
-            .iter()
-            .map(|(date, name)| {
-                let datetime = DateTime::<Utc>::from_utc(
-                    chrono::NaiveDateTime::from_timestamp_opt(*date, 0).unwrap(),
-                    Utc,
-                );
-
-                let formatted_date = datetime.format("%d-%m-%y").to_string();
-
-                (formatted_date, name.to_string())
-            })
-            .collect::<BTreeMap<String, String>>();
-
+        context.insert("username", &user.username());
+        let appointments = user.appointments();
         context.insert("appointments", &appointments);
         context
     };
@@ -169,9 +118,41 @@ pub fn add_appointment(
 
     let person = body.get("name").unwrap();
 
-    user.add_appointment(redis_mutex, id, (unix_time, person.to_string()));
+    user.add_appointment(id, (unix_time, person.to_string()));
+    user.write_to_redis(redis_mutex);
+    appointments(user)
+}
 
-    appointments(username, redis_mutex)
+pub fn search_appointments(
+    username: &str,
+    redis_mutex: &mut Mutex<Client>,
+    search_term: &str,
+) -> String {
+    let mut user = User::read_user(username, redis_mutex).unwrap();
+    let mut context = Context::new();
+    context.insert("username", &user.username());
+
+    context.insert("username", &user.username());
+    let appointments = user.search_appointments(search_term);
+    context.insert("appointments", &appointments);
+
+    let response_body = render_html("appointments.html", context);
+    let headers = get_basic_headers(&response_body, "html");
+
+    format_response(response_body, headers, "200")
+}
+
+pub fn delete_appointment(
+    username: &str,
+    redis_mutex: &mut Mutex<Client>,
+    body: HashMap<String, String>,
+) -> String {
+    let mut user = User::read_user(username, redis_mutex).unwrap();
+
+    let id = body.get("id").unwrap();
+    user.remove_appointment(id);
+    user.write_to_redis(redis_mutex);
+    appointments(user)
 }
 
 pub fn logout() -> String {
@@ -180,9 +161,8 @@ pub fn logout() -> String {
 
     headers.insert(
         "Set-cookie".to_owned(),
-        format!("name=; expires=Thu, 01 Jan 1970 00:00:00 GMT"),
+        format!("name=; Max-Age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT\r\n"),
     );
-    headers.insert("Location".to_owned(), "/appointments".to_owned());
 
     format_response(response_body, headers, "200")
 }

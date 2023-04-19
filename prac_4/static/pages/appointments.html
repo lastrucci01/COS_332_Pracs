@@ -10,11 +10,11 @@
     <header>
         <h1>Appointment Book</h1>
         <form action="logout">
-            <button class="logout">Logout</button>
+            <button class="logout" action="logout">Logout</button>
         </form>
     </header>
 
-    <div class="main_box">
+    <div class="top_box">
         <h2> Hey {{ username }}!</h2>
         <h3> Welcome to your Appointment book! </h3>
 
@@ -22,18 +22,28 @@
 
     <div class="horiz_divider"></div>
 
-    <div class="main_box">
+    <div class="appointments_box">
         {% if appointments %}
         <h2>Appointments</h2>
-        <button class="add_appointment" onclick="openPopup()">Add Appointment</button>
+        <div class="search">
+            <button class="add_appointment" onclick="openPopup()">Add Appointment</button>
+            <form method="post" id="search">
+                <label for="search">Search:</label>
+                <input type="text" id="search" name="search" onchange="submitSearch()">
+                <input type="hidden" name="type" value="search">
+            </form>
+        </div>
         <ul class="appointment_list">
-            {% for date, name in appointments %}
+            {% for id, appoint in appointments %}
             <li class="appointment">
-                <span class="appointment_date">{{ date }}</span>
-                <span class="appointment_description">{{ name }}</span>
-                <a href="#" class="edit_appointment"><i class="fa fa_pencil"></i></a>
-                <a href="#" class="delete_appointment"><i class="fa fa_trash"></i></a>
-                </span>
+                <span class="appointment_date">{{ appoint.0 }}</span>
+                <span class="appointment_description">{{ appoint.1 }}</span>
+
+                <form class="std" method="post">
+                    <input type="hidden" name="id" value="{{ id }}">
+                    <input type="hidden" name="type" value="delete">
+                    <button class="delete_appointment">X</button>
+                </form>
             </li>
             {% endfor %}
         </ul>
@@ -50,8 +60,9 @@
     </div>
 
     <div class="main_box">
-        <div class="popup" id="appointment-popup">
-            <form method="POST" action="add_appointment">
+        <div class="popup" id="appointment_popup">
+            <form method="POST">
+                <input type="hidden" name="type" value="add_appointment">
                 <label for="name">Appointment Name:</label>
                 <input type="text" id="name" name="name">
                 <br><br>
@@ -59,7 +70,7 @@
                 <input type="date" id="date" name="date">
                 <br><br>
                 <input type="submit" value="Add">
-                <button onclick="closePopup()">Cancel</button>
+                <button type="button" onclick="closePopup()">Cancel</button>
             </form>
         </div>
     </div>
