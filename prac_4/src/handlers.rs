@@ -68,7 +68,6 @@ fn handle_request(request: String, redis_mutex: &mut Mutex<Client>) -> String {
 
             match req_type.as_str() {
                 "login" => login(form.get("login").unwrap(), redis_mutex),
-                "signup" => signup_post(form.get("signup").unwrap(), redis_mutex),
                 "add_appointment" => {
                     if let Some(username) = username {
                         add_appointment(&username, redis_mutex, form)
@@ -93,7 +92,6 @@ fn handle_request(request: String, redis_mutex: &mut Mutex<Client>) -> String {
                 _ => panic!("failed matching POST request type"),
             }
         }
-
         ("GET", "/logout?") => logout(),
 
         _ => four0four(),
