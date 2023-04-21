@@ -9,18 +9,19 @@
 <body>
     <header>
         <h1>Appointment Book</h1>
-        <form action="logout">
-            <button class="logout" action="logout">Logout</button>
-        </form>
+
     </header>
 
     <div class="top_box">
         <h2> Hey {{ username }}!</h2>
         <h3> Welcome to your Appointment book! </h3>
-
+        <form method="post" , action="image">
+            <button class="logout" action="image.png">U ok?</button>
+        </form>
     </div>
 
-    <div class="horiz_divider"></div>
+    <div class=" horiz_divider">
+    </div>
 
     <div class="appointments_box">
         {% if appointments %}

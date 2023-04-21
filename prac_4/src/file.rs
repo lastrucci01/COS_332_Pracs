@@ -14,6 +14,18 @@ pub fn get_contents(path: &str) -> String {
     contents
 }
 
+pub fn get_image(path: &str) -> Vec<u8> {
+    let mut exe_path = env::current_exe().unwrap();
+    for _ in 0..3 {
+        exe_path = exe_path.parent().unwrap().to_path_buf();
+    }
+    let filepath = format!("{}/{}", exe_path.to_str().unwrap(), path);
+    let mut file = File::open(&filepath).unwrap();
+    let mut buffer = Vec::new();
+    file.read_to_end(&mut buffer).expect("failed to read file");
+    buffer
+}
+
 pub fn render_html(file_name: &str, context: Context) -> String {
     let mut exe_path = env::current_exe().unwrap();
     for _ in 0..3 {

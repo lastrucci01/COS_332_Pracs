@@ -51,6 +51,7 @@ pub fn get_basic_headers(response_body: &str, content_type: &str) -> HashMap<Str
         match content_type {
             "html" => String::from("text/html"),
             "css" => String::from("text/css"),
+            "png" => String::from("image/png"),
             "js" => String::from("application/javascript"),
             _ => panic!("Content type failed"),
         },

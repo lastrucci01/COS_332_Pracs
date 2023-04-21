@@ -1,5 +1,6 @@
 use std::{
     collections::HashMap,
+    fs::File,
     io::{Read, Write},
     net::TcpStream,
     sync::Mutex,
@@ -11,7 +12,7 @@ use url::form_urlencoded;
 use crate::{
     headers::get_username,
     methods::{
-        add_appointment, content, delete_appointment, four0four, home, login, logout,
+        add_appointment, content, delete_appointment, four0four, home, image, login, logout,
         search_appointments, signup_get, signup_post,
     },
 };
@@ -24,13 +25,10 @@ pub fn handle_client(mut stream: TcpStream) {
     stream.read(&mut buffer).unwrap();
     let request = String::from_utf8((&buffer[..]).to_vec()).unwrap();
 
-    let response = handle_request(request, &mut redis_mutex);
-
-    stream.write(response.as_bytes()).unwrap();
-    stream.flush().unwrap();
+    let response = handle_request(request, &mut redis_mutex, stream);
 }
 
-fn handle_request(request: String, redis_mutex: &mut Mutex<Client>) -> String {
+fn handle_request(request: String, redis_mutex: &mut Mutex<Client>, mut stream: TcpStream) {
     let (header, body) = request.trim().split_once("\r\n\r\n").unwrap();
 
     let mut parts = header.trim().split_whitespace();
@@ -46,7 +44,7 @@ fn handle_request(request: String, redis_mutex: &mut Mutex<Client>) -> String {
     } else {
         None
     };
-    match (method, path) {
+    let response = match (method, path) {
         ("GET", "/") => {
             if let Some(username) = username {
                 login(&username, redis_mutex)
@@ -57,9 +55,16 @@ fn handle_request(request: String, redis_mutex: &mut Mutex<Client>) -> String {
         ("GET", "/signup") => signup_get(),
         ("GET", "/style.css") => content("css"),
         ("GET", "/script.js") => content("js"),
-        ("POST", "/signuo") => {
+        ("POST", "/signup") => {
             let form: HashMap<String, String> = parse_body(body.trim_end_matches(char::from(0)));
             signup_post(form.get("signup").unwrap(), redis_mutex)
+        }
+        ("POST", "/image") => {
+            let (resp, buffer) = image();
+
+            stream.write(resp.as_bytes()).unwrap();
+            stream.write(&buffer).unwrap();
+            return;
         }
         ("POST", "/") => {
             let form: HashMap<String, String> = parse_body(body.trim_end_matches(char::from(0)));
@@ -95,7 +100,10 @@ fn handle_request(request: String, redis_mutex: &mut Mutex<Client>) -> String {
         ("GET", "/logout?") => logout(),
 
         _ => four0four(),
-    }
+    };
+
+    stream.write(response.as_bytes()).unwrap();
+    stream.flush().unwrap();
 }
 
 fn parse_body(body: &str) -> HashMap<String, String> {

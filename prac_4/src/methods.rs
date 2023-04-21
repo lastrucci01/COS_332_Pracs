@@ -6,7 +6,7 @@ use tera::Context;
 use uuid::Uuid;
 
 use crate::{
-    file::{get_contents, render_html},
+    file::{get_contents, get_image, render_html},
     headers::{format_response, get_basic_headers},
     user::User,
 };
@@ -21,6 +21,17 @@ pub fn content(value: &str) -> String {
     let headers = get_basic_headers(&response_body, content.0);
 
     format_response(response_body, headers, "200")
+}
+
+pub fn image() -> (String, Vec<u8>) {
+    let buffer = get_image("static/image.png");
+
+    let resp = format!(
+        "HTTP/1.1 200 OK\r\nContent-Type: image/jpeg\r\nContent-Length: {}\r\n\r\n",
+        buffer.len(),
+    );
+
+    (resp, buffer)
 }
 
 pub fn home() -> String {
