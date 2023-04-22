@@ -1,6 +1,5 @@
 use std::{
     collections::HashMap,
-    fs::File,
     io::{Read, Write},
     net::TcpStream,
     sync::Mutex,
@@ -25,7 +24,7 @@ pub fn handle_client(mut stream: TcpStream) {
     stream.read(&mut buffer).unwrap();
     let request = String::from_utf8((&buffer[..]).to_vec()).unwrap();
 
-    let response = handle_request(request, &mut redis_mutex, stream);
+    handle_request(request, &mut redis_mutex, stream);
 }
 
 fn handle_request(request: String, redis_mutex: &mut Mutex<Client>, mut stream: TcpStream) {
