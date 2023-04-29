@@ -1,0 +1,1 @@
+/Users/richardlastrucci/Desktop/pracs/332/pracs/prac_6/target/debug/prac_six: /Users/richardlastrucci/Desktop/pracs/332/pracs/prac_6/src/friend.rs /Users/richardlastrucci/Desktop/pracs/332/pracs/prac_6/src/main.rs
