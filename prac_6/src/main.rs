@@ -34,11 +34,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     stream.write_all(helo_command.as_bytes())?;
     stream.read(&mut buffer)?;
 
-    let mail_from_command = "MAIL FROM:<sender@example.com>\r\n";
+    let mail_from_command = "MAIL FROM:<birthday@332.mail.server>\r\n";
     stream.write_all(mail_from_command.as_bytes())?;
     stream.read(&mut buffer)?;
 
-    let rcpt_to_command = "RCPT TO:<recipient@example.com>\r\n";
+    let rcpt_to_command = "RCPT TO:<lastrucci63@gmail.com>\r\n";
     stream.write_all(rcpt_to_command.as_bytes())?;
     stream.read(&mut buffer)?;
 
