@@ -1,7 +1,5 @@
 use std::{env, fs::read_to_string};
 
-use chrono::Month;
-
 #[derive(Debug)]
 pub struct Friend {
     name: String,
@@ -27,7 +25,7 @@ impl Friend {
     }
 
     pub fn name(&self) -> String {
-        self.name()
+        self.name.to_owned()
     }
     pub fn month(&self) -> u32 {
         self.date.1
