@@ -9,21 +9,17 @@ use std::{
 use chrono::{Datelike, Duration, Local, NaiveDate};
 use friend::{friends_from_file, Friend};
 
-// Define a struct to hold a friend's information
-
 fn main() -> Result<(), Box<dyn Error>> {
     let friends = friends_from_file("dates.txt");
-
     let upcoming_birthdays = upcoming_birthdays(friends);
 
-    // Compose the email message
     let email_body = compose_email_body(upcoming_birthdays);
     let message = format!(
-            "From: sender@332.birthday.com\r\nTo: lastrucci63@gmail.com\r\nSubject: Upcoming Birthdays\r\n\r\n{}",
+            "From: sender@332.mail.server\r\nTo: lastrucci63@gmail.com\r\nSubject: Upcoming Birthdays\r\n\r\n{}",
             email_body
         );
 
-    // Send the email using SMTP
+    // Send the email
     let smtp_server = "127.0.0.1";
     let smtp_port = 25;
     let mut stream = TcpStream::connect(format!("{}:{}", smtp_server, smtp_port))?;
@@ -34,7 +30,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     stream.write_all(helo_command.as_bytes())?;
     stream.read(&mut buffer)?;
 
-    let mail_from_command = "MAIL FROM:<birthday@332.mail.server>\r\n";
+    let mail_from_command = "MAIL FROM:<sender@332.mail.server>\r\n";
     stream.write_all(mail_from_command.as_bytes())?;
     stream.read(&mut buffer)?;
 
