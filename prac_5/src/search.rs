@@ -4,6 +4,7 @@ pub struct SearchRequest<'a> {
     base_dn: &'a str,
     attribute: &'a str,
 }
+
 impl<'a> SearchRequest<'a> {
     pub fn new(base_dn: &'a str) -> Self {
         Self {
