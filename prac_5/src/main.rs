@@ -2,10 +2,10 @@ pub mod bind;
 pub mod delete;
 pub mod search;
 
-use rustyline::{DefaultEditor, Editor};
-use std::collections::HashMap;
-use std::io::{stdin, stdout, BufRead, BufReader, Read, Write};
+use std::io::{Read, Write};
 use std::net::TcpStream;
+
+use rustyline::DefaultEditor;
 
 use crate::bind::BindRequest;
 use crate::delete::DeleteRequest;
