@@ -15,7 +15,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let email_body = compose_email_body(upcoming_birthdays);
     let message = format!(
-            "From: sender@332.mail.server\r\nTo: lastrucci63@gmail.com\r\nSubject: Upcoming Birthdays\r\n\r\n{}",
+            "From: birthday@332.mail.server\r\nTo: richard@332.mail.server\r\nSubject: Upcoming Birthdays\r\n\r\n{}",
             email_body
         );
 
@@ -30,11 +30,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     stream.write_all(helo_command.as_bytes())?;
     stream.read(&mut buffer)?;
 
-    let mail_from_command = "MAIL FROM:<sender@332.mail.server>\r\n";
+    let mail_from_command = "MAIL FROM:<birthday@332.mail.server>\r\n";
     stream.write_all(mail_from_command.as_bytes())?;
     stream.read(&mut buffer)?;
 
-    let rcpt_to_command = "RCPT TO:<lastrucci63@gmail.com>\r\n";
+    let rcpt_to_command = "RCPT TO:<richard@332.mail.server>\r\n";
     stream.write_all(rcpt_to_command.as_bytes())?;
     stream.read(&mut buffer)?;
 
