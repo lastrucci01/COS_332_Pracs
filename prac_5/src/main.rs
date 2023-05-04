@@ -36,6 +36,7 @@ fn main() {
             "Q" => {
                 stream.write(&bind.unbind(msg_id)).unwrap();
                 println!("Unbind: {}Success!{}", "\x1b[32m", "\x1b[0m");
+                break;
             }
             "S" => {
                 let name = rl
