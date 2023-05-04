@@ -44,4 +44,8 @@ impl<'a> BindRequest<'a> {
         bytes.insert(1, bytes.len() as u8 - 1);
         bytes
     }
+
+    pub fn unbind(&self, msg_id: u8) -> Vec<u8> {
+        vec![0x30, 0x05, 0x02, 0x01, msg_id, 0x42, 0x00]
+    }
 }
