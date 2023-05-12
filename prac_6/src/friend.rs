@@ -9,18 +9,24 @@ pub struct Friend {
 impl Friend {
     pub fn new(line: &str) -> Self {
         let mut date_name = line.split_whitespace();
-        let date = date_name.next().unwrap();
-        let day_month = date.split('/').collect::<Vec<&str>>();
+        if let Some(date) = date_name.next() {
+            let day_month = date.split('/').collect::<Vec<&str>>();
 
-        let mut day_month = day_month.into_iter();
-        let day = day_month.next().unwrap().parse::<u32>().unwrap();
-        let month = day_month.next().unwrap().parse::<u32>().unwrap();
+            let mut day_month = day_month.into_iter();
+            let day = day_month.next().unwrap().parse::<u32>().unwrap();
+            let month = day_month.next().unwrap().parse::<u32>().unwrap();
 
-        let name = date_name.next().unwrap();
+            let name = date_name.next().unwrap();
 
-        Self {
-            name: name.to_string(),
-            date: (day, month),
+            Self {
+                name: name.to_string(),
+                date: (day, month),
+            }
+        } else {
+            Self {
+                name: "hi".to_string(),
+                date: (25, 07),
+            }
         }
     }
 
@@ -53,7 +59,7 @@ pub fn friends_from_file(filename: &str) -> Vec<Friend> {
     let file_contents = read_to_string(path_buf).expect("Could not read file");
 
     let mut it = file_contents.split('\n');
-    while let Some(line) = it.next()  {
+    while let Some(line) = it.next() {
         friends.push(Friend::new(line));
     }
 
