@@ -52,8 +52,8 @@ pub fn friends_from_file(filename: &str) -> Vec<Friend> {
 
     let file_contents = read_to_string(path_buf).expect("Could not read file");
 
-    for line in file_contents.split('\n') {
-        println!("{}", line);
+    let mut it = file_contents.split('\n');
+    while let Some(line) = it.next()  {
         friends.push(Friend::new(line));
     }
 
